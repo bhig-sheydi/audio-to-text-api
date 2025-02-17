@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import fs from "fs";
+import { createReadStream, unlinkSync } from "fs"; // Corrected fs usage
 import { OpenAI } from "openai";
 import dotenv from "dotenv";
 
@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
     cb(null, "uploads/"); 
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
+    cb(null, Date.now() + "-" + file.originalname); 
   },
 });
 
@@ -23,7 +23,7 @@ const upload = multer({ storage });
 
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, 
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 
@@ -35,15 +35,16 @@ app.post("/transcribe", upload.single("audio"), async (req, res) => {
 
     const audioPath = req.file.path;
 
-    
+  
     const transcription = await openai.audio.transcriptions.create({
-      file: fs.createReadStream(audioPath),
-      model: "whisper-1",
+      file: createReadStream(audioPath),
+      model: "whisper-1", 
     });
 
     
-    fs.unlinkSync(audioPath);
+    unlinkSync(audioPath);
 
+  
     res.json({ transcription: transcription.text });
   } catch (error) {
     console.error("Error transcribing audio:", error);
@@ -55,3 +56,5 @@ app.post("/transcribe", upload.single("audio"), async (req, res) => {
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
+
+export default app; 
