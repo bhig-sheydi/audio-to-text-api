@@ -1,14 +1,13 @@
 import express from "express";
 import multer from "multer";
-import { createReadStream, unlinkSync } from "fs"; // Corrected fs usage
+import { createReadStream, unlinkSync } from "fs"; 
 import { OpenAI } from "openai";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const app = express();
+const server = express(); // Rename from 'app' to 'server'
 const port = 3000;
-
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -21,13 +20,11 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-
-app.post("/transcribe", upload.single("audio"), async (req, res) => {
+server.post("/transcribe", upload.single("audio"), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
@@ -35,16 +32,13 @@ app.post("/transcribe", upload.single("audio"), async (req, res) => {
 
     const audioPath = req.file.path;
 
-  
     const transcription = await openai.audio.transcriptions.create({
       file: createReadStream(audioPath),
       model: "whisper-1", 
     });
 
-    
     unlinkSync(audioPath);
 
-  
     res.json({ transcription: transcription.text });
   } catch (error) {
     console.error("Error transcribing audio:", error);
@@ -52,9 +46,8 @@ app.post("/transcribe", upload.single("audio"), async (req, res) => {
   }
 });
 
-
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
 
-export default app; 
+export default server; // Keep this as 'server'
