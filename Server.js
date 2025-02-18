@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const server = express(); // Rename from 'app' to 'server'
+const server = express();
 const port = 3000;
 
 const storage = multer.diskStorage({
@@ -50,4 +50,4 @@ server.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
 
-export default server; // Keep this as 'server'
+export default server; 
