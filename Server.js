@@ -45,7 +45,9 @@ server.post("/transcribe", upload.single("audio"), async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
+server.get("/", (req, res) => {
+  res.send("Hello World!");
+});
 server.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
